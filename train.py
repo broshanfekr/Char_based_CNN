@@ -1,6 +1,3 @@
-#! /usr/bin/env python
-# based on ideas in https://github.com/dennybritz/cnn-text-classification-tf
-
 import tensorflow as tf
 import numpy as np
 import os
@@ -42,7 +39,7 @@ def create_parser():
 
     ############################# model hyper parameters #################################
     parser.add_argument(
-        '--max_seq_len_cutoff', '-max_seq_len_cutoff', type=int, default=1014,
+        '--max_seq_len_cutoff', '-max_seq_len_cutoff', type=int, default=1000,
         help="the max len of a sentence."
     )
 
@@ -175,7 +172,6 @@ with tf.Graph().as_default():
 
         # Keep track of gradient values and sparsity (optional)
         grad_summaries = []
-        grad_summaries = []
         for g, v in grads_and_vars:
             if g is not None:
                 grad_hist_summary = tf.summary.histogram("{}/grad/hist".format(v.name), g)
@@ -208,10 +204,10 @@ with tf.Graph().as_default():
         checkpoint_prefix = os.path.join(checkpoint_dir, "model")
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
-        saver = tf.train.Saver(tf.all_variables())
+        saver = tf.train.Saver(tf.global_variables())
 
         # Initialize all variables
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
 
         def train_step(x_batch, y_batch, epoch_num):
             """
